@@ -1,0 +1,22 @@
+{
+  "npmScope": "fe-code-convention",
+  "implicitDependencies": {
+    "workspace.json": "*",
+    "package.json": {
+      "dependencies": "*",
+      "devDependencies": "*"
+    },
+    "tsconfig.json": "*",
+    "tslint.json": "*",
+    "nx.json": "*"
+  },
+  "projects": {
+    "small-app": {
+      "tags": []
+    },
+    "small-app-e2e": {
+      "tags": [],
+      "implicitDependencies": ["small-app"]
+    }
+  }
+}
