@@ -1,76 +1,286 @@
-# FeCodeConvention
+# Stupic - A FE code convention set
+> Looks like stupid, right? It comes from an ancient Chinese saying: 'Great wisdom looks stupid. Great skill seems clumsy.'.  
+> It's also a combination of several files types of the core code convention [`Folder as Component`](#folder-as-component) of this convention set, which are `Style`, `Type`, `hoo(U)k`, `Props-renderer`, `Index` and `Constant`.
 
-This project was generated using [Nx](https://nx.dev).
 
-<p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png" width="450"></p>
+## Table of Contents
 
-🔎 **Nx is a set of Extensible Dev Tools for Monorepos.**
+- Folder as Component
+- Naming
+- Project Dependency
 
-## Adding capabilities to your workspace
+## Folder as Component 
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+As [answered by the React official](https://reactjs.org/docs/faq-structure.html), grouping by features/routes and by file types are both very helpful. What I refine one step further here is to treat a folder containing different types of files for a specific feature as a component. After all, component is the first-class citizen in React world.
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+### Classic HTML/CSS/JS files
 
-Below are some plugins which you can add to your workspace:
+When we construct a ui interface, we have to consider the **html dom tree**, the **css dom tree** and the **js business logic**. When us engineers write code for these 3 different things, we think in different mode. So I don't like the idea of messing them up together
 
-- [React](https://reactjs.org)
-  - `npm install --save-dev @nrwl/react`
-- Web (no framework frontends)
-  - `npm install --save-dev @nrwl/web`
-- [Angular](https://angular.io)
-  - `npm install --save-dev @nrwl/angular`
-- [Nest](https://nestjs.com)
-  - `npm install --save-dev @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `npm install --save-dev @nrwl/express`
-- [Node](https://nodejs.org)
-  - `npm install --save-dev @nrwl/node`
+What `React` brings to us is that it creates a mapper from data in js part to html dom in the html part. Unfortunately, `react` didn't handle the other parts for us at the beginning. `stupic`(I personally) choose `styled-components` as the `css-in-js` solution for the css part, you can choose your own and replace the file format accordingly. And after `React` support `hooks`, we have a great tool to handle logic, too.
 
-## Generate an application
+### Component.tsx
 
-Run `nx g @nrwl/react:app my-app` to generate an application.
+A normal `React` component can be written inside such a file alone and it's also the original format of a `stupic` component. Everything starts from this file and will be assembled here. A typical `React` component with `styled-components` and `typescript` could look like this:
 
-> You can use any of the plugins above to generate applications as well.
+```ts
+import React, { useState } from 'react';
+import styled from 'styled-components';
 
-When using Nx, you can create multiple applications and libraries in the same workspace.
+const StyledComponent = styled.div`
+  // some css fragments
+`;
 
-## Generate a library
+interface Props {
+  // some ts definitions
+}
 
-Run `nx g @nrwl/react:lib my-lib` to generate a library.
+interface State {
+  // some ts definitions
+}
 
-> You can also use any of the plugins above to generate libraries as well.
+const meta = {
+  // some constant meta data
+}
 
-Libraries are sharable across libraries and applications. They can be imported from `@fe-code-convention/mylib`.
+const initializeState = (props: Props): State => {};
 
-## Development server
+export const Component: FC<Props> = (props) => {
+  const [state, setState] = useState(() => initializeState(props));
+  // some other hooks
 
-Run `nx serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
+  return (
+    <StyledComponent>
+      {/* some react vdom fragments */}
+    </StyledComponent>
+  );
+}
+```
 
-## Code scaffolding
+If the component keeps small, the component is not very hard to maintain.
 
-Run `nx g @nrwl/react:component my-component --project=my-app` to generate a new component.
+> However, what if it doesn't?
 
-## Build
+### Component/styled.Component.ts
 
-Run `nx build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+When a `React` component has multiple styled components, the code above the core component could be so long that it affects the understanding for the core `html dom tree` and `js logic` parts. That's when we extract all styled components out to a `Component/styled.Component.ts` file and `import * as S` to use:
 
-## Running unit tests
+```ts
+// Component/styled.Component.ts
+export const Component = style.div`
 
-Run `nx test my-app` to execute the unit tests via [Jest](https://jestjs.io).
+`;
 
-Run `nx affected:test` to execute the unit tests affected by a change.
+export const Header = styled.div`
 
-## Running end-to-end tests
+`;
 
-Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
+export const Content = styled.div`
 
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
+`;
 
-## Understand your workspace
+export const Footer = styled.div`
 
-Run `nx dep-graph` to see a diagram of the dependencies of your projects.
+`;
 
-## Further help
+// Component/Component.tsx
+import * as S from './styled.Component';
 
-Visit the [Nx Documentation](https://nx.dev) to learn more.
+<S.Component>
+  <S.Header>
+    {/* some header code */}
+  </S.Header>
+  <S.Content>
+    {/* some content code */}
+  </S.Content>
+  <S.Footer>
+    {/* some footer code */}
+  </S.Footer>
+</S.Component>
+```
+
+You might feel strange about the `import * as S` convention, that's another rule we will discuss later. The main point here is to split these styled components into another file to keep the core `html dom tree` part clean and simple.
+
+> Again, `styled-components` is an opinioned choice, you can replace it with other css solutions like `less/scss` or `styled-jsx` as you want. Just replace the file name with `Component.less`, `style.Component.ts`. The key is to keep the representiveness for css dom tree.
+
+### Component/useComponent.ts
+
+And when the logic part gets too complex,
+
+### Component/types.Component.ts
+
+### Component/const.Component.ts
+
+### Component/Component.ts
+
+### Component/index.ts
+
+
+## Naming
+
+### Function/Component name as file name
+
+Use long specific names for components and functions instead of fuzzy names:
+
+```bash
+# Good
+ArticleHeader/ArticleHeader.tsx
+useBreakpoints.ts
+withDataTable.tsx
+parseLink.ts 
+mediaUtils.ts
+
+# Bad
+ArticleHeader/index.tsx
+article-components.tsx
+hooks.ts
+hocs.tsx
+utils.ts
+constants.ts
+```
+
+### Resource plus Shape as component name
+
+Use long specific names combining business resource and shape type instead of fuzzy names:
+
+```ts
+// Good
+const ArticleCard = () => <div>...</div>;
+const ArticlePage = () => <div>...</div>;
+const ArticleBox = () => <div>...</div>;
+const ArticleList = () => <div>...</div>;
+const ArticleTable = () => <div>...</div>;
+
+// Bad
+const Article = () => <div>...</div>;
+const ArticleWrapper = () => <div>...</div>;
+const ArticleComponent = () => <div>...</div>;
+```
+
+### Prefer long&consistant names
+
+Long names normally mean clarity and consistancy can improve readibility.
+
+```bash
+# Good
+ArticleCard/index.ts
+ArticleCard/ArticleCard.tsx
+ArticleCard/ArticleHeader.tsx
+QuestionCard/index.ts
+QuestionCard/QuestionCard.tsx
+QuestionCard/QuestionHeader.tsx
+
+# Bad
+# write component in this file to save one file
+ArticleCard/index.tsx
+ArticleCard/Header.tsx
+QuestionCard/index.tsx
+QuestionCard/Header.tsx
+```
+
+And in files:
+
+```ts
+// Good
+const ArticleCard = () => <div>...</div>;
+const useArticleCard = () => {};
+const buildArticleFromFormValues = () => {};
+
+const ArticleHeader = () => <div>...</div>;
+const QuestionCard = () => <div>...</div>;
+const QuestionHeader = () => <div>...</div>;
+
+// Bad
+const ArticleCard = () => <div>...</div>;
+const useArticles = () => {};
+const formatFormValues = () => {};
+const Header = () => <div>...</div>;
+const QuestionCard = () => <div>...</div>;
+const Header = () => <div>...</div>;
+
+
+// Good in ArticleCard/index.ts
+export { ArticleHeader } from './ArticleHeader';
+
+// Bad in ArticleCard/index.ts
+export { Header } from './ArticleHeader';
+```
+
+### Shortcuts as words
+
+Although we don't recommend using shortcuts only for shorter names, but when we use them, use them as words:
+
+```ts
+// Good
+const buildTocOfCdnUrls = () => {};
+const getHtmlFromServer = () => {};
+const getHtmlsFromServer = () => {};
+
+// Bad
+const buildToCofCDNURLs = () => {};
+const buildToC_of_CDN_URLs = () => {};
+const getHTMLFromServer = () => {};
+const getHTMLsFromServer = () => {};
+```
+
+### Regularize irregular plural nones
+
+Not all engineers are native English speakers, and we can understand if they are in the wrong foramt as long as it has a necessary `s` or `es` suffix. Sometimes, right plural nouns can even cause misunderstandings.
+
+```ts
+// Good
+const articleIndexs = [];
+const pageSchemas = [];
+const metaDatas = [];
+const currencys = [];
+const fishes = [];
+const analysises = [];
+
+// Bad
+const articleIndices = [];
+const pageSchema = [];
+const metaData = [];
+const currencies = [];
+const fish = [];
+const analyses = [];
+
+// Workaround
+const articleIndexList = [];
+const pageSchemaList = [];
+const metaDataList = [];
+const currencyList = [];
+const fishList = [];
+const analysisList = [];
+```
+
+### camelCase for leaf file name
+
+Use camelCase for leaf files(except using `ClassCase` for Components, as React official recommended):
+
+```bash
+# Good
+article/ArticleGrid/ArticleCard.tsx
+
+# Bad
+article/article-card/article-card.tsx
+// Remember we consider folder as component
+article/article-card/ArticleCard.tsx
+
+```
+
+### dashed-case for namespace folder name
+
+Normally, we strongly recommend against using namespaces, but when you need one,
+
+```bash
+# Good
+article-components/ArticleGrid/ArticleCard.tsx
+article-utils/groupArticlesByTag.ts
+article-types/relatedArticles.ts
+
+# Bad
+articleComponents/ArticleGrid/ArticleCard.tsx
+// Remember that we consider folder as component, component folder is not a namespace here
+article-components/article-card/ArticleCard.tsx
+
+```
