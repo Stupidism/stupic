@@ -5,8 +5,6 @@
 
 ## Table of contents
 
-- [Stupic - A FE code convention set](#stupic---a-fe-code-convention-set)
-  - [Table of contents](#table-of-contents)
   - [Folder as component](#folder-as-component)
     - [S.tyled components are different](#styled-components-are-different)
     - [Use hook to handle logic](#use-hook-to-handle-logic)

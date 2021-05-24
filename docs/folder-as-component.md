@@ -4,7 +4,6 @@ As [answered by the React official](https://reactjs.org/docs/faq-structure.html)
 
 Before I introduct what's `Folder as Component`, let's have a look at the classic model of Front-end world.
 
-- [Folder as Component](#folder-as-component)
     - [Classic HTML/CSS/JS Files](#classic-htmlcssjs-files)
     - [Normal React Component File](#normal-react-component-file)
     - [Style-heavy Components](#style-heavy-components)
