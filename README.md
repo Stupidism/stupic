@@ -3,6 +3,7 @@
 > It's also a combination of several files types of the core code convention [`Folder as Component`](./docs/folder-as-component) of this convention set, which are `Style`, `Type`, `hoo(U)k`, `Props-renderer`, `Index` and `Constant`.
 
 
+## Table of contents
 - [Folder as component](#folder-as-component)
   - [S.tyled components are different](#styled-components-are-different)
   - [Use hook to handle logic](#use-hook-to-handle-logic)
@@ -18,14 +19,18 @@
   - [Regularize irregular plural nones](#regularize-irregular-plural-nones)
   - [camelCase for leaf file name](#camelcase-for-leaf-file-name)
   - [dashed-case for namespace folder name](#dashed-case-for-namespace-folder-name)
-- [Project Management](#project-management)
-  - [Use absolute path for other components](#use-absolute-path-for-other-components)
-  - [Use relative path inside folder components](#use-relative-path-inside-folder-components)
-  - [Use enginner name as prefix of feature/fix branches](#use-enginner-name-as-prefix-of-featurefix-branches)
 - [Styling](#styling)
   - [Order css properties in 3 levels of parent-self-children](#order-css-properties-in-3-levels-of-parent-self-children)
   - [Use Component name as prefix for public class names](#use-component-name-as-prefix-for-public-class-names)
-
+- [Api](#api)
+  - [Use Functions/Hooks to fetch data](#use-functionshooks-to-fetch-data)
+  - [Use one param as api function input](#use-one-param-as-api-function-input)
+- [Project Management](#project-management)
+  - [Use separate library to mange resource types](#use-separate-library-to-mange-resource-types)
+  - [Use separate libraries to manage api functions for different backends](#use-separate-libraries-to-manage-api-functions-for-different-backends)
+  - [Use absolute path for other components](#use-absolute-path-for-other-components)
+  - [Use relative path inside folder components](#use-relative-path-inside-folder-components)
+  - [Use enginner name as prefix of feature/fix branches](#use-enginner-name-as-prefix-of-featurefix-branches)
 
 ## Folder as component
 
@@ -902,94 +907,6 @@ article-components/article-card/ArticleCard.tsx
 
 ```
 
-## Project Management
-
-### Use absolute path for other components
-
-Absolute path means no long or wrong `../`s. Also it would be easier to make code work after copying and pasting in another file.
-
-```ts
-// Good
-// Component/Component.ts
-import { Button } from '@/components/Button';
-import { Typography } from '~components/Typography';
-import { Typography } from '@my-org/my-lib/lib/Typography';
-import { Icon } from '@my-org/other-lib';
-
-```
-
-```ts
-// Bad
-// Component/Component.ts
-import { Button } from '../Button';
-import { Typography } from '../Typography';
-```
-
-### Use relative path inside folder components
-```ts
-// Good
-// Component/Component.ts
-import { Props } from './types.Component';
-import { useComponent } from './useComponent';
-
-```
-
-```ts
-// Bad
-// Component/Component.ts
-import { Props } from '@/components/Component/types.Component';
-import { useComponent } from '@/components/Component/useComponent';
-```
-
-### Use enginner name as prefix of feature/fix branches
-
-Managing branches in monorepo could be very hard, name-prefixed branches would make your life easier.
-
-```bash
-# Good
-
-$ git branch
-
-  feng/add-component-generator
-* feng/fix-custom-env-preview-mode
-  feng/fix-image-responsive-bug
-  feng/fix-library-babelrc
-  feng/fix-section-children-box-shadow
-  feng/fix-ssr-className-mismatch-bug
-  feng/fix-ssr-className-mismatch-bug-experiment
-  feng/fix-ssr-className-mismatch-bug2
-  feng/fix-video-url-of-review
-  feng/implement-reviews-with-contentful
-  feng/responsive-container
-```
-
-```bash
-# Bad
-
-$ git branch -r 
-
-  origin/tesseract-example
-  origin/test
-  origin/testa
-  origin/testinglib
-  origin/tmp-test
-  origin/tonygjerry-patch-1
-  origin/trav-telematics-limit
-  origin/travelers--retention-fix-attempt-3-using-proxy
-  origin/tsconfig-correct
-  origin/ui-expert-qna
-  origin/ui-seo-insurance-e2e
-  origin/update-prequal
-  origin/update-usdl-regex
-  origin/webhook-basic
-  origin/wip
-  origin/workaround_user_prompt_as_expect_error
-  origin/wq-confirm-driver
-  origin/wq-estimate-quoting-loader
-  origin/wq-state-min-coverage
-
-```
-
 ## Styling
 
 ### Order css properties in 3 levels of parent-self-children
@@ -1095,3 +1012,291 @@ const ComponentB = styled.div`
 `;
 
 ```
+
+## Api
+
+### Use Functions/Hooks to fetch data
+
+Api calls are side effects. Manage them with a promise or a meta object and we don't need to know which kind of backend we're using. No matter it's graphql, or fetch or axios or any other libraries.
+
+```ts
+// Good
+const getArticles: Promise<Response<Article[]>> = async (params: ArticlesQueryParams) => {  
+  // Build options for api caller
+  const options = buildApiOptions(params);
+
+  // Call api with fetch or other api clients. e.g. graphql or axios
+  return fetch(options);
+}
+
+const useArticles = async (params: ArticlesQueryParams): {
+  loading: boolean;
+  error: Error;
+  response: Response<Article[]>;
+  data: Article[];
+} => {
+  const [loading, setLoading] = useState(false);
+  const [response, setResponse] = useState([]);
+  const [error, setError] = useState(null);
+
+  const callApi = async () => {
+    setLoading(true);
+    try {
+      const response = await getArticles(params);
+
+      setResponse(response);
+    } catch(e) {
+      setError(e);
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    callApi();
+  }, [callApi]);
+
+  return {
+    loading,
+    error,
+    response,
+    data: response.path.to.data,
+  }
+}
+
+// or with hook libraries
+const useArticles = (params: ArticlesQueryParams) => {
+  // Build options for api caller
+  const options = buildApiOptions(params);
+
+  return useQuery<Response<Article>, Options>(options);
+}
+
+// Get type guarded articles in business code with one line code.
+import { useArticles } from '@scope/xxx-api';
+
+const Component = () => {
+  const { data: articles } = useArticles(params);
+
+}
+```
+
+```ts
+// Bad
+// Import many stuff 
+import { Article, ArticleQuery, ArticleResponse } from '@scope/xxx-api';
+import { useQuery } from '@apollo/client';
+// import { useAxios } from 'axios';
+
+const Component = () => {
+  // Write all the states and api calls inside component code. e.g.
+  const { loading, data, error } = useQuery<Response<Article>, Options>(options);
+}
+```
+
+### Use one param as api function input
+
+One param makes refactoring easier and middleware(params builder) easier.
+
+```diff
+// Good
+
+interface ArticleQueryParams {
+  id: string,
++ withAuthor?: boolean,  
+}
+
+const useArticle = (params: ArticleQueryParams) => {
+
+};
+
+const articleParamsBuilder = (formValues: FormValues): ArticleQueryParams => {
+  return {
+    id: formValues.id,
++   withAuthor: formValues.withAuthor,
+  }
+}
+
+const Component = () => {
+  const { data: article } = useArticle(articleParamsBuilder(formValues));
+}
+
+```
+
+```diff
+// Bad
+
+const useArticle = (
+  id: string,
++ withAuthor?: boolean 
+) => {
+  
+};
+
+-const articleParamsBuilder = (formValues: FormValues): string => {
+-  return formValues.id;
+
++const articleParamsBuilder = (formValues: FormValues): [string, boolean] => {
+  return [formValues.id, formValues.withAuthor]
+}
+
+const Component = () => {
+- const { data: article } = useArticle(articleParamsBuilder(formValues));
++ const { data: article } = useArticle(...articleParamsBuilder(formValues));
+}
+```
+
+
+## Project Management
+
+### Use separate library to mange resource types
+
+```ts
+// Good
+// @scope/xxx-types/src/resources/articles.ts
+interface Article {
+
+}
+
+// @scope/fe-app/src/components/ArticlePage.ts
+import type { Article } from '@scope/xxx-types';
+
+// @scope/be-app/src/app/article/resolvers/article.resolver.ts
+import type { Article } from '@scope/xxx-types';
+
+```
+
+```ts
+// Bad
+// @scope/fe-app/src/types/graphql/articles
+interface FrontendArticle {
+
+}
+
+// @scope/fe-app/src/components/ArticlePage.ts
+import type { FrontendArticle } from '../types/graphql/articles';
+
+// @scope/be-app/src/app/article/graphql-types/articles.ts
+interface BackendArticle {
+
+}
+
+// @scope/be-app/src/app/article/resolvers/article.resolver.ts
+import type { BackendArticle } from '../graphql-types/articles';
+
+```
+
+### Use separate libraries to manage api functions for different backends
+
+```ts
+// Good
+// @scope/xxx-api/src/api-hooks/useArticles.ts
+const useArticles = () => {}
+
+// @scope/fe-app-a/src/components/ArticleListPage.ts
+import { useArticles } from '@scope/xxx-api';
+
+// @scope/fe-app-b/src/components/ArticleManagementPage.ts
+import { useArticles } from '@scope/xxx-api';
+```
+
+```ts
+// Bad
+// @scope/fe-app-a/src/api-hooks/useArticles.ts
+const useArticles = () => {}
+
+// @scope/fe-app-a/src/components/ArticleListPage.ts
+import { useArticles } from '../api-hooks/useArticles';
+
+// @scope/fe-app-b/src/api-hooks/useArticles.ts
+const useArticles = () => {}
+
+// @scope/fe-app-b/src/components/ArticleManagementPage.ts
+import { useArticles } from '../api-hooks/useArticles';
+```
+
+### Use absolute path for other components
+
+Absolute path means no long or wrong `../`s. Also it would be easier to make code work after copying and pasting in another file.
+
+```ts
+// Good
+// Component/Component.ts
+import { Button } from '@/components/Button';
+import { Typography } from '~components/Typography';
+import { Typography } from '@my-org/my-lib/lib/Typography';
+import { Icon } from '@my-org/other-lib';
+
+```
+
+```ts
+// Bad
+// Component/Component.ts
+import { Button } from '../Button';
+import { Typography } from '../Typography';
+```
+
+### Use relative path inside folder components
+```ts
+// Good
+// Component/Component.ts
+import { Props } from './types.Component';
+import { useComponent } from './useComponent';
+
+```
+
+```ts
+// Bad
+// Component/Component.ts
+import { Props } from '@/components/Component/types.Component';
+import { useComponent } from '@/components/Component/useComponent';
+```
+
+### Use enginner name as prefix of feature/fix branches
+
+Managing branches in monorepo could be very hard, name-prefixed branches would make your life easier.
+
+```bash
+# Good
+
+$ git branch
+
+  feng/add-component-generator
+* feng/fix-custom-env-preview-mode
+  feng/fix-image-responsive-bug
+  feng/fix-library-babelrc
+  feng/fix-section-children-box-shadow
+  feng/fix-ssr-className-mismatch-bug
+  feng/fix-ssr-className-mismatch-bug-experiment
+  feng/fix-ssr-className-mismatch-bug2
+  feng/fix-video-url-of-review
+  feng/implement-reviews-with-contentful
+  feng/responsive-container
+```
+
+```bash
+# Bad
+
+$ git branch -r 
+
+  origin/tesseract-example
+  origin/test
+  origin/testa
+  origin/testinglib
+  origin/tmp-test
+  origin/tonygjerry-patch-1
+  origin/trav-telematics-limit
+  origin/travelers--retention-fix-attempt-3-using-proxy
+  origin/tsconfig-correct
+  origin/ui-expert-qna
+  origin/ui-seo-insurance-e2e
+  origin/update-prequal
+  origin/update-usdl-regex
+  origin/webhook-basic
+  origin/wip
+  origin/workaround_user_prompt_as_expect_error
+  origin/wq-confirm-driver
+  origin/wq-estimate-quoting-loader
+  origin/wq-state-min-coverage
+
+```
+
