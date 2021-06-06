@@ -2,7 +2,7 @@
 
 As [answered by the React official](https://reactjs.org/docs/faq-structure.html), grouping by features/routes and by file types are both very helpful. What I refine one step further here is to treat a folder containing different types of files for a specific feature as a component. After all, component is the first-class citizen in the React world.
 
-Before I introduct what's `Folder as Component`, let's have a look at the classic model of Front-end world.
+Before I introduce what's `Folder as Component`, let's have a look at the classic model of Front-end world.
 
     - [Classic HTML/CSS/JS Files](#classic-htmlcssjs-files)
     - [Normal React Component File](#normal-react-component-file)

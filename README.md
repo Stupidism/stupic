@@ -1,28 +1,31 @@
 # Stupic - A FE code convention set
 > Looks like stupid, aha? It comes from an ancient Chinese saying: 'Great wisdom looks stupid. Great skill seems clumsy.'.  
-> It's also a combination of several files types of the core code convention [`Folder as Component`](#folder-as-component) of this convention set, which are `Style`, `Type`, `hoo(U)k`, `Props-renderer`, `Index` and `Constant`.
+> It's also a combination of several files types of the core code convention [`Folder as Component`](./docs/folder-as-component) of this convention set, which are `Style`, `Type`, `hoo(U)k`, `Props-renderer`, `Index` and `Constant`.
 
 
-## Table of contents
+- [Folder as component](#folder-as-component)
+  - [S.tyled components are different](#styled-components-are-different)
+  - [Use hook to handle logic](#use-hook-to-handle-logic)
+  - [Types should not cut off code](#types-should-not-cut-off-code)
+  - [Constants can be long and sensitive to react components](#constants-can-be-long-and-sensitive-to-react-components)
+  - [Props Renderer Component is the core](#props-renderer-component-is-the-core)
+  - [Index file re-exports public components & variables](#index-file-re-exports-public-components--variables)
+- [Naming](#naming)
+  - [Function/Component name as file name](#functioncomponent-name-as-file-name)
+  - [Resource plus Shape as component name](#resource-plus-shape-as-component-name)
+  - [Prefer long&consistant names](#prefer-longconsistant-names)
+  - [Shortcuts as words](#shortcuts-as-words)
+  - [Regularize irregular plural nones](#regularize-irregular-plural-nones)
+  - [camelCase for leaf file name](#camelcase-for-leaf-file-name)
+  - [dashed-case for namespace folder name](#dashed-case-for-namespace-folder-name)
+- [Project Management](#project-management)
+  - [Use absolute path for other components](#use-absolute-path-for-other-components)
+  - [Use relative path inside folder components](#use-relative-path-inside-folder-components)
+  - [Use enginner name as prefix of feature/fix branches](#use-enginner-name-as-prefix-of-featurefix-branches)
+- [Styling](#styling)
+  - [Order css properties in 3 levels of parent-self-children](#order-css-properties-in-3-levels-of-parent-self-children)
+  - [Use Component name as prefix for public class names](#use-component-name-as-prefix-for-public-class-names)
 
-  - [Folder as component](#folder-as-component)
-    - [S.tyled components are different](#styled-components-are-different)
-    - [Use hook to handle logic](#use-hook-to-handle-logic)
-    - [Types should not cut off code](#types-should-not-cut-off-code)
-    - [Constants can be long and sensitive to react components](#constants-can-be-long-and-sensitive-to-react-components)
-    - [Props Renderer Component is the core](#props-renderer-component-is-the-core)
-    - [Index file re-exports public components & variables](#index-file-re-exports-public-components--variables)
-  - [Naming](#naming)
-    - [Function/Component name as file name](#functioncomponent-name-as-file-name)
-    - [Resource plus Shape as component name](#resource-plus-shape-as-component-name)
-    - [Prefer long&consistant names](#prefer-longconsistant-names)
-    - [Shortcuts as words](#shortcuts-as-words)
-    - [Regularize irregular plural nones](#regularize-irregular-plural-nones)
-    - [camelCase for leaf file name](#camelcase-for-leaf-file-name)
-    - [dashed-case for namespace folder name](#dashed-case-for-namespace-folder-name)
-  - [Project Management](#project-management)
-    - [Use absolute path for other components](#use-absolute-path-for-other-components)
-    - [Use relative path inside folder components](#use-relative-path-inside-folder-components)
 
 ## Folder as component
 
@@ -49,6 +52,9 @@ import * as S from './styled.Component';
   <S.SubComponent />
 </S.Component>
 
+```
+
+```ts
 // Bad
 // Component.ts
 const SubComponent = styled.div`
@@ -77,6 +83,9 @@ const Component = () => (
   </S.Component>
 );
 
+```
+
+```ts
 // Bad
 // Component.ts
 const Component = () => (
@@ -121,6 +130,9 @@ import * as S from './styled.Component';
   </S.Footer>
 </S.Component>
 
+```
+
+```ts
 // Bad
 // Component.ts
 import { ComponentContainer, Header, Content, Footer } from './styled.Component';
@@ -162,6 +174,9 @@ import * as S from './styled.Component';
   <OtherComponent className="override-other-component" />
 </S.Component>
 
+```
+
+```ts
 // Bad
 // styled.Component.ts
 export const Component = styled.div`
@@ -215,6 +230,9 @@ import * as S from './styled.Component';
   </Modal>
 </S.Component>
 
+```
+
+```ts
 // Bad
 // styled.Component.ts
 export const Component = styled.div`
@@ -259,8 +277,8 @@ export const Component = styled.div`
 // Good
 // useComponent.ts
 const useComponent = (props) => {
-  const res1 = useApi1();
-  const res2 = useApi2();
+  const res1 = useSomeHook();
+  const res2 = useAnotherHook();
 
   const loading = res1.loading || res2.loading;
   const error = res1.error || res2.error;
@@ -288,10 +306,13 @@ const Component = (props) => {
 }
 
 
+```
+
+```ts
 // Bad
 const Component = (props) => {
-  const res1 = useApi1();
-  const res2 = useApi2();
+  const res1 = useSomeHook();
+  const res2 = useAnotherHook();
   
   const loading = res1.loading || res2.loading;
   const error = res1.error || res2.error;
@@ -323,6 +344,9 @@ const Component = () => {
   );
 }
 
+```
+
+```ts
 // Bad
 // useComponent.ts
 const useComponent = () => {
@@ -381,6 +405,9 @@ const useComponent = (props: Props): HookProps => {
 
 }
 
+```
+
+```ts
 // Bad
 interface Props {
   id?: number,
@@ -435,6 +462,9 @@ const apiCall = async (values: FormValues): Resource => {
   }}
 >
 
+```
+
+```ts
 // Bad
 const a: number = 3;
 
@@ -473,6 +503,9 @@ const Component = () => (
   <SomeComponent pageMeta={pageMeta}>
 );
 
+```
+
+```ts
 // Bad
 const Component = () => {
   // New object reference every time when Component renders.
@@ -512,6 +545,9 @@ const Button = styled.button`
 import { PAGE_SIZE } from './const.Component';
 const res = useApi({ pageSize: PAGE_SIZE });
 
+```
+
+```ts
 // Bad
 // Component.ts
 <S.Button>Fixed Width</S.Button>
@@ -548,6 +584,9 @@ const Component = ({ title }) => {
   );
 }
 
+```
+
+```ts
 // Bad
 // Component.ts
 const Component = ({ title }) => {
@@ -592,6 +631,9 @@ const Component = (props) => {
   return <ComponentRenderer {...props} data={data} />;
 }
 
+```
+
+```ts
 // Bad
 const Component = (props) => {
   const { error, loading, data } = useApi();
@@ -639,6 +681,9 @@ import { StyledComponentHeader, buildResourceAFromResourceB, ComponentRenderer, 
   </StyledComponentHeader>
 </S.OtherParentComponent>
 
+```
+
+```ts
 // Bad
 // OtherParentComponent.ts
 import * as ComopnentS from 'Component/styled.Component';
@@ -693,11 +738,17 @@ const ArticleBox = () => <div>...</div>;
 const ArticleList = () => <div>...</div>;
 const ArticleTable = () => <div>...</div>;
 
+```
+
+```ts
 // Bad
 const Article = () => <div>...</div>;
 const ArticleWrapper = () => <div>...</div>;
 const ArticleComponent = () => <div>...</div>;
+const Component = () => <div>...</div>;
 ```
+
+For more shapes, you can refer [material-ui components](https://material-ui.com/components/grid/).
 
 ### Prefer long&consistant names
 
@@ -726,14 +777,17 @@ And in files:
 ```ts
 // Good
 // ArticleCard
-const Card = () => <div>...</div>;
+const ArticleCard = () => <div>...</div>;
 const useArticleCard = () => {};
 const buildArticleFromFormValues = () => {};
 
 const ArticleHeader = () => <div>...</div>;
-const Card = () => <div>...</div>;
+const QuestionCard = () => <div>...</div>;
 const QuestionHeader = () => <div>...</div>;
 
+```
+
+```ts
 // Bad
 const Card = () => <div>...</div>;
 const useArticles = () => {};
@@ -742,12 +796,16 @@ const Header = () => <div>...</div>;
 // QuestionCard
 const Card = () => <div>...</div>;
 const Header = () => <div>...</div>;
+```
 
-
+```ts
 // Good in ArticleCard/index.ts
 export { ArticleHeader } from './ArticleHeader';
 export { Props as ArticleCardProps } from './types.ArticleCardProps';
 
+```
+
+```ts
 // Bad in ArticleCard/index.ts
 export { Header } from './ArticleHeader';
 export { Props } from './types.ArticleCardProps';
@@ -759,11 +817,18 @@ Although we don't recommend using shortcuts only for shorter names, but when we 
 
 ```ts
 // Good
+import GraphqlJson from 'graphql-type-json';
+
 const buildTocOfCdnUrls = () => {};
 const getHtmlFromServer = () => {};
 const getHtmlsFromServer = () => {};
+```
 
+```ts
 // Bad
+// From official code example of graphql-type-json
+import GraphQLJSON from 'graphql-type-json';
+
 const buildToCofCDNURLs = () => {};
 const buildToC_of_CDN_URLs = () => {};
 const getHTMLFromServer = () => {};
@@ -783,6 +848,9 @@ const currencys = [];
 const fishes = [];
 const analysises = [];
 
+```
+
+```ts
 // Bad
 const articleIndices = [];
 const pageSchema = [];
@@ -806,6 +874,8 @@ Use camelCase for leaf files(except using `ClassCase` for Components, as React o
 
 ```bash
 # Good
+article/ArticleGrid/useArticleCard.tsx
+// Except for react components
 article/ArticleGrid/ArticleCard.tsx
 
 # Bad
@@ -846,6 +916,9 @@ import { Typography } from '~components/Typography';
 import { Typography } from '@my-org/my-lib/lib/Typography';
 import { Icon } from '@my-org/other-lib';
 
+```
+
+```ts
 // Bad
 // Component/Component.ts
 import { Button } from '../Button';
@@ -859,10 +932,166 @@ import { Typography } from '../Typography';
 import { Props } from './types.Component';
 import { useComponent } from './useComponent';
 
+```
+
+```ts
 // Bad
 // Component/Component.ts
 import { Props } from '@/components/Component/types.Component';
 import { useComponent } from '@/components/Component/useComponent';
 ```
 
+### Use enginner name as prefix of feature/fix branches
 
+Managing branches in monorepo could be very hard, name-prefixed branches would make your life easier.
+
+```bash
+# Good
+
+$ git branch
+
+  feng/add-component-generator
+* feng/fix-custom-env-preview-mode
+  feng/fix-image-responsive-bug
+  feng/fix-library-babelrc
+  feng/fix-section-children-box-shadow
+  feng/fix-ssr-className-mismatch-bug
+  feng/fix-ssr-className-mismatch-bug-experiment
+  feng/fix-ssr-className-mismatch-bug2
+  feng/fix-video-url-of-review
+  feng/implement-reviews-with-contentful
+  feng/responsive-container
+```
+
+```bash
+# Bad
+
+$ git branch -r 
+
+  origin/tesseract-example
+  origin/test
+  origin/testa
+  origin/testinglib
+  origin/tmp-test
+  origin/tonygjerry-patch-1
+  origin/trav-telematics-limit
+  origin/travelers--retention-fix-attempt-3-using-proxy
+  origin/tsconfig-correct
+  origin/ui-expert-qna
+  origin/ui-seo-insurance-e2e
+  origin/update-prequal
+  origin/update-usdl-regex
+  origin/webhook-basic
+  origin/wip
+  origin/workaround_user_prompt_as_expect_error
+  origin/wq-confirm-driver
+  origin/wq-estimate-quoting-loader
+  origin/wq-state-min-coverage
+
+```
+
+## Styling
+
+### Order css properties in 3 levels of parent-self-children
+
+When we write a lot of css properties, they could be very hard to read. A small tip is to separate them into 3 sections. 1. css that pair with parent 2. css that control itself 3. css that controls its children
+
+```less
+/* Good */
+.grand-parent {
+  // Control self
+  width: 100%;
+
+  // Control children
+  position: relative;
+
+  .parent {
+    // Pair with parent's parent
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    // Control self
+    color: red;
+    background: yellow;
+
+    // Control children
+    display: flex;
+
+    .child {
+      // Pair with parent
+      flex: 1;
+
+      // Control self
+      width: 33%;
+    }
+  }
+}
+```
+
+
+```less
+/* Bad */
+.grand-parent {
+  position: relative;
+  width: 100%;
+
+  .parent {
+    display: flex;
+    position: absolute;
+    top: 0;
+    color: red;
+    left: 0;
+    right: 0;
+    background: yellow;
+
+    .child {
+      width: 33%;
+      flex: 1;
+    }
+  }
+}
+```
+
+### Use Component name as prefix for public class names
+
+```ts
+// Good
+const ComponentA = styled.div`
+  .ComponentA-public-class-name {
+
+  }
+
+  .inner-class-name {
+
+  }
+`;
+
+const ComponentB = styled.div`
+  .ComponentA-public-class-name {
+    // override some css
+  }
+`;
+
+```
+
+```ts
+// Bad
+const ComponentA = styled.div`
+  .public-class-name {
+
+  }
+`;
+
+const ComponentB = styled.div`
+  .public-class-name {
+    // override some css
+  }
+
+  .inner-class-name {
+    // override some css
+  }
+`;
+
+```
