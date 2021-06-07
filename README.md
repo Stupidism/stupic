@@ -1,6 +1,6 @@
 # Stupic - A FE code convention set
 > Looks like stupid, aha? It comes from an ancient Chinese saying: 'Great wisdom looks stupid. Great skill seems clumsy.'.  
-> It's also a combination of several files types of the core code convention [`Folder as Component`](./docs/folder-as-component) of this convention set, which are `Style`, `Type`, `hoo(U)k`, `Props-renderer`, `Index` and `Constant`.
+> It's also a combination of several files types of the core code convention [`Folder as Component`](./docs/folder-as-component.md) of this convention set, which are `Style`, `Type`, `hoo(U)k`, `Props-renderer`, `Index` and `Constant`.
 
 
 ## Table of contents
