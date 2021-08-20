@@ -4,7 +4,7 @@
 
 
 ## Table of contents
-- [Folder as component](#folder-as-component)
+- [Folder as component](#folder-as-component.md)
   - [S.tyled components are different](#styled-components-are-different)
   - [Use hook to handle logic](#use-hook-to-handle-logic)
   - [Types should not cut off code](#types-should-not-cut-off-code)
@@ -34,7 +34,7 @@
 
 ## Folder as component
 
-Click to read more about the thoughts behind [`folder-as-component`](./docs/folder-as-component).
+Click to read more about the thoughts behind [`folder-as-component`](./docs/folder-as-component.md).
 
 ### S.tyled components are different
 
